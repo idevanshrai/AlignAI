@@ -1,4 +1,4 @@
-resume-genius/
+AlignAI/
 │
 ├── backend/
 │   ├── app.py                     # Flask app
