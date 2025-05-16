@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlignAI | Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-background">
+      <div class="circuit-overlay"></div>
+      <div class="gradient-overlay"></div>
+    </div>
+
+    <div class="login-card">
+      <div class="logo">
+        <i class="fas fa-robot"></i>
+        <h1>Align<span>AI</span></h1>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="tab-btn active" id="loginTab">Login</button>
+        <button class="tab-btn" id="signupTab">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form active">
+        <div class="input-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" required>
+          <i class="fas fa-envelope"></i>
+        </div>
+
+        <div class="input-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" required>
+          <i class="fas fa-lock"></i>
+          <button type="button" class="show-password" aria-label="Show password">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+
+        <div class="options">
+          <label class="remember-me">
+            <input type="checkbox" id="rememberMe">
+            <span>Remember me</span>
+          </label>
+          <a href="#" id="forgotPassword">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="auth-btn">
+          <span>Login</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+
+        <div class="divider">
+          <span>or continue with</span>
+        </div>
+
+        <div class="social-login">
+          <button type="button" class="social-btn google" id="googleLogin">
+            <i class="fab fa-google"></i> Google
+          </button>
+          <button type="button" class="social-btn github" id="githubLogin">
+            <i class="fab fa-github"></i> GitHub
+          </button>
+        </div>
+
+        <button type="button" class="guest-btn" id="guestLogin">
+          <span>Continue as Guest</span>
+          <i class="fas fa-user-clock"></i>
+        </button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" class="auth-form">
+        <div class="input-group">
+          <label for="signupName">Full Name</label>
+          <input type="text" id="signupName" required>
+          <i class="fas fa-user"></i>
+        </div>
+
+        <div class="input-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" required>
+          <i class="fas fa-envelope"></i>
+        </div>
+
+        <div class="input-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" required minlength="6">
+          <i class="fas fa-lock"></i>
+          <button type="button" class="show-password" aria-label="Show password">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+
+        <div class="input-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" required>
+          <i class="fas fa-lock"></i>
+          <button type="button" class="show-password" aria-label="Show password">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+
+        <div class="terms">
+          <label>
+            <input type="checkbox" id="agreeTerms" required>
+            <span>I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a></span>
+          </label>
+        </div>
+
+        <button type="submit" class="auth-btn">
+          <span>Create Account</span>
+          <i class="fas fa-user-plus"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Guest Mode Modal -->
+    <div class="modal" id="guestModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-user-clock"></i> Guest Mode</h3>
+        </div>
+        <div class="modal-body">
+          <p>In guest mode, you won't be able to:</p>
+          <ul>
+            <li><i class="fas fa-times-circle"></i> Save your analysis history</li>
+            <li><i class="fas fa-times-circle"></i> Access premium features</li>
+            <li><i class="fas fa-times-circle"></i> Sync across devices</li>
+          </ul>
+          <p>We recommend signing up for the full experience.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancelGuest">Sign Up Instead</button>
+          <button class="btn-primary" id="confirmGuest">Continue as Guest</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple auth.js implementation that will work without Supabase
+    document.addEventListener('DOMContentLoaded', () => {
+      // Tab switching
+      const loginTab = document.getElementById('loginTab');
+      const signupTab = document.getElementById('signupTab');
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+
+      loginTab.addEventListener('click', () => {
+        loginTab.classList.add('active');
+        signupTab.classList.remove('active');
+        loginForm.classList.add('active');
+        signupForm.classList.remove('active');
+      });
+
+      signupTab.addEventListener('click', () => {
+        signupTab.classList.add('active');
+        loginTab.classList.remove('active');
+        signupForm.classList.add('active');
+        loginForm.classList.remove('active');
+      });
+
+      // Password toggle
+      document.querySelectorAll('.show-password').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const input = e.currentTarget.parentElement.querySelector('input');
+          const icon = e.currentTarget.querySelector('i');
+
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+          } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+          }
+        });
+      });
+
+      // Guest login
+      const guestLoginBtn = document.getElementById('guestLogin');
+      const guestModal = document.getElementById('guestModal');
+      const confirmGuestBtn = document.getElementById('confirmGuest');
+      const cancelGuestBtn = document.getElementById('cancelGuest');
+
+      guestLoginBtn.addEventListener('click', () => {
+        guestModal.style.display = 'flex';
+      });
+
+      confirmGuestBtn.addEventListener('click', () => {
+        sessionStorage.setItem('guestMode', 'true');
+        window.location.href = 'index.html';
+      });
+
+      cancelGuestBtn.addEventListener('click', () => {
+        guestModal.style.display = 'none';
+        signupTab.click();
+      });
+
+      // Close modal when clicking outside
+      window.addEventListener('click', (e) => {
+        if (e.target === guestModal) {
+          guestModal.style.display = 'none';
+        }
+      });
+
+      // Form submissions (basic version without actual auth)
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // In a real app, you would validate credentials here
+        sessionStorage.setItem('guestMode', 'false');
+        window.location.href = 'index.html';
+      });
+
+      signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+          alert("Passwords don't match!");
+          return;
+        }
+
+        if (!document.getElementById('agreeTerms').checked) {
+          alert("You must agree to the terms!");
+          return;
+        }
+
+        sessionStorage.setItem('guestMode', 'false');
+        window.location.href = 'index.html';
+      });
+
+      // Social login buttons
+      document.getElementById('googleLogin').addEventListener('click', () => {
+        alert("Google login would be implemented here");
+      });
+
+      document.getElementById('githubLogin').addEventListener('click', () => {
+        alert("GitHub login would be implemented here");
+      });
+
+      // Forgot password
+      document.getElementById('forgotPassword').addEventListener('click', (e) => {
+        e.preventDefault();
+        const email = prompt('Enter your email to reset password:');
+        if (email) {
+          alert(`Password reset link would be sent to ${email}`);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
