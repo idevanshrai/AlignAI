@@ -3,7 +3,7 @@ import os
 import json
 import re
 
-# Configure Gemini
+#Gemini
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 model = genai.GenerativeModel('models/gemini-1.5-flash')
 
@@ -58,17 +58,17 @@ def get_gemini_insights(resume_text, jd_text, scores):
     """
 
     try:
-        # Use more controlled generation configuration
+        
         response = model.generate_content(
             prompt,
             generation_config={
-                "temperature": 0.3,  # More deterministic output
+                "temperature": 0.3, 
                 "max_output_tokens": 2000,
                 "top_p": 0.95
             }
         )
 
-        # Improved parsing
+        # parsing
         return extract_structured_response(response.text)
     except Exception as e:
         print(f"Gemini API error: {str(e)}")
@@ -96,7 +96,6 @@ def extract_structured_response(text):
         json_str = text[text.find('{'):text.rfind('}') + 1]
         return json.loads(json_str)
     except json.JSONDecodeError:
-        # Fallback to manual parsing if JSON is malformed
         return parse_unstructured_response(text)
 
 
@@ -116,8 +115,5 @@ def parse_unstructured_response(text):
     improvements = re.findall(r'\d+\.\s*(.*?)(?=\n\d+\.|\n\n|$)', text)
     if improvements and len(improvements) >= 3:
         result["improvements"] = improvements[:3]
-
-    # Extract other sections similarly...
-    # (Implementation would continue with more regex patterns)
 
     return result
