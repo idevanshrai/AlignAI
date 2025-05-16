@@ -12,20 +12,14 @@ resume-genius/
 │   ├── index.html                 # Main UI page
 │   ├── login.html                 # Login/signup page
 │   ├── splash.html                # Splash screen (auto redirects)
-│   ├── dashboard.html             # After login dashboard
 │   ├── css/
 │   │   ├── style.css              # Global styles (dark mode, fonts)
-│   │   ├── dashboard.css          # Dashboard-specific styles
+│   │   ├── login.css              # Login page-specific styles
 │   │   └── splash.css             # Splash screen styles
 │   │
 │   ├── js/
 │   │   ├── auth.js                # Handles login/signup via Supabase
-│   │   ├── api.js                 # Handles API calls to Flask
-│   │   ├── darkmode.js            # Light/dark mode toggle
 │   │   ├── script.js              # Index page js handling
-│   │   ├── background.js          # 3D / blob / particles background
-│   │   ├── uploadHandler.js       # Handles resume + JD uploads
-│   │   ├── resultRenderer.js      # Handles visual score display
 │   │   └── utils.js               # Common helper JS
 │   │
 │   └── assets/
