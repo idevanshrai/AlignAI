@@ -1,0 +1,57 @@
+resume-genius/
+│
+├── backend/
+│   ├── app.py                     # Flask app
+│   ├── requirements.txt           # Python dependencies
+│   └── utils/
+│       ├── parser.py              # Resume/JD parsing logic
+│       ├── scoring.py             # TF-IDF, BERT, skill matching
+│       └── helpers.py             # Common utility functions
+│
+├── frontend/
+│   ├── index.html                 # Main UI page
+│   ├── login.html                 # Login/signup page
+│   ├── splash.html                # Splash screen (auto redirects)
+│   ├── dashboard.html             # After login dashboard
+│   ├── css/
+│   │   ├── style.css              # Global styles (dark mode, fonts)
+│   │   ├── dashboard.css          # Dashboard-specific styles
+│   │   └── splash.css             # Splash screen styles
+│   │
+│   ├── js/
+│   │   ├── auth.js                # Handles login/signup via Supabase
+│   │   ├── api.js                 # Handles API calls to Flask
+│   │   ├── darkmode.js            # Light/dark mode toggle
+│   │   ├── script.js              # Index page js handling
+│   │   ├── background.js          # 3D / blob / particles background
+│   │   ├── uploadHandler.js       # Handles resume + JD uploads
+│   │   ├── resultRenderer.js      # Handles visual score display
+│   │   └── utils.js               # Common helper JS
+│   │
+│   └── assets/
+│       ├── fonts/                 # Custom fonts (if any)
+│       ├── icons/                 # Icons for upload, user, logout
+│       ├── logo.svg               # Project logo
+│       ├── splash-animation.json  # Lottie/3D animation
+│       └── backgrounds/           # BG images or models
+│
+├── .env                           # Environment variables
+├── supabase/
+│   ├── schema.sql                 # DB schema for Supabase
+│   └── supabase.config.json       # Project config (optional)
+│
+└── README.md
+
+
+-------------------------------------------------------------------------------------
+| File                | Purpose                                                     |
+| ------------------- | ----------------------------------------------------------- |
+| `auth.js`           | Login, logout, signup, session handling using Supabase Auth |
+| `api.js`            | Calls Flask backend API (upload resume, get results)        |
+| `darkmode.js`       | Toggles between light and dark theme, saves preference      |
+| `background.js`     | Renders background animation (particles, 3D blob, etc.)     |
+| `typewriter.js`     | Typewriter animation for messages and suggestions           |
+| `uploadHandler.js`  | Handles file input, drag-n-drop, form submission            |
+| `resultRenderer.js` | Shows score, matched/missing skills, suggestions            |
+| `utils.js`          | Common JS utilities (formatting, delay, etc.)               |
+-------------------------------------------------------------------------------------

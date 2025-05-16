@@ -1,0 +1,13 @@
+Frontend (HTML/CSS/JS)
+    |
+    | (Resume file + JD text)
+    ↓
+Flask Backend (Python)
+    1. Extract text from files
+    2. Clean & preprocess
+    3. Extract keywords
+    4. Compute similarity
+    5. Send match score + keywords back
+    ↑
+    |
+Frontend displays results (JS/HTML)
