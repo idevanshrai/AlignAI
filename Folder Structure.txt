@@ -20,7 +20,7 @@ resume-genius/
 │   ├── js/
 │   │   ├── auth.js                # Handles login/signup via Supabase
 │   │   ├── script.js              # Index page js handling
-│   │   └── utils.js               # Common helper JS
+│   │   
 │   │
 │   └── assets/
 │       ├── fonts/                 # Custom fonts (if any)
