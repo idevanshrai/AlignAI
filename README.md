@@ -55,18 +55,43 @@ Open `frontend/splash.html` or `frontend/index.html` to use the app.
 ## 📁 Project Structure
 
 ```
-AlignAI/
+AAlignAI/
+│
 ├── backend/
-│   ├── app.py
-│   ├── utils/
-│   │   ├── parser.py
-│   │   └── scoring.py
-│   └── requirements.txt
+│   ├── app.py                     
+│   ├── requirements.txt           
+│   └── utils/
+│       ├── parser.py              
+│       ├── scoring.py             
+│       └── helpers.py             
+│
 ├── frontend/
-│   ├── index.html
-│   ├── splash.html
-│   ├── splash.css
+│   ├── index.html                 
+│   ├── login.html                 
+│   ├── splash.html                
+│   ├── css/
+│   │   ├── style.css              
+│   │   ├── login.css              
+│   │   └── splash.css             
+│   │
+│   ├── js/
+│   │   ├── auth.js                
+│   │   ├── script.js              
+│   │   
+│   │
 │   └── assets/
+│       ├── fonts/                 
+│       ├── icons/                
+│       ├── logo.svg               
+│       ├── splash-animation.json  
+│       └── backgrounds/           
+│
+├── .env                           
+├── supabase/
+│   ├── schema.sql                 
+│   └── supabase.config.json       
+│
+└── README.md
 ```
 
 ---
