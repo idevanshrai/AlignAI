@@ -4,33 +4,29 @@ from utils.parser import extract_text_from_pdf, extract_skills_from_text
 from utils.scoring import calculate_match_score
 from utils.gemini_analysis import get_gemini_insights
 import nltk
-import ssl
 import os
 import logging
 import numpy as np
+import datetime
 from typing import Dict, Any, List
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
-# SSL Bypass for local development
-ssl._create_default_https_context = ssl._create_unverified_context
-
 # NLTK Setup
-nltk_data_path = os.path.expanduser('~/nltk_data')
-nltk.data.path.append(nltk_data_path)
-
-required_nltk_data = ['punkt', 'stopwords', 'punkt_tab', 'averaged_perceptron_tagger']
-for package in required_nltk_data:
-    try:
-        nltk.data.find(
-            f'tokenizers/{package}' if 'punkt' in package else f'taggers/{package}' if 'perceptron' in package else f'corpora/{package}')
-    except LookupError:
-        nltk.download(package, download_dir=nltk_data_path)
+try:
+    nltk.data.find('tokenizers/punkt')
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('punkt')
+    nltk.download('stopwords')
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Enable CORS for all routes
 
 def convert_numpy_types(obj):
     """Convert numpy types to native Python types"""
@@ -120,4 +116,5 @@ def analyze():
         }), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    port = int(os.environ.get("PORT", 5001))
+    app.run(host='0.0.0.0', port=port)
