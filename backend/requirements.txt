@@ -5,3 +5,12 @@ scikit-learn
 nltk
 sentence-transformers
 numpy
+fitz
+re
+typing
+sklearn.feature_extraction.text
+sentence_transformers
+logging
+google.generativeai
+os
+json

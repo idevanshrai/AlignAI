@@ -11,7 +11,7 @@ const historyList = document.getElementById('historyList');
 
 // State
 let currentUser = {
-  name: "John Doe", // This would come from your auth system
+  name: "Guest", // This would come from your auth system
   history: [] // This would be loaded from your backend
 };
 

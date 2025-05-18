@@ -2,118 +2,166 @@ import google.generativeai as genai
 import os
 import json
 import re
+from typing import Dict, Any
+import logging
 
-#Gemini
+# Configure logging
+logger = logging.getLogger(__name__)
+
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 model = genai.GenerativeModel('models/gemini-1.5-flash')
 
+def get_gemini_insights(resume_text: str, jd_text: str, scores: Dict[str, Any]) -> Dict[str, Any]:
+    """Enhanced AI-powered resume analysis with structured output"""
+    # Validate and normalize scores
+    normalized_scores = {
+        'final_score': min(max(scores.get('final_score', 0), 0), 100),
+        'skill_score': min(max(scores.get('skill_score', 0.0), 0.0), 1.0),
+        'experience_score': min(max(scores.get('experience_score', 0.0), 0.0), 1.0),
+        'atis_score': min(max(scores.get('atis_score', 0), 0), 100)
+    }
 
-def get_gemini_insights(resume_text, jd_text, scores):
-    """Get AI-powered resume analysis from Gemini"""
     prompt = f"""
-    **Resume Analysis Task**
+    **Resume Analysis Report**
 
-    **Resume Text** (first 10,000 characters):
-    {resume_text[:10000]}
-
-    **Job Description** (first 5,000 characters):
+    **Job Requirements Analysis:**
     {jd_text[:5000]}
 
-    **Current Assessment Scores**:
-    - Text Relevance (TF-IDF): {scores['tfidf_score']}/1.0
-    - Semantic Match (BERT): {scores['bert_score']}/1.0  
-    - Skill Match: {scores['skill_score']}/1.0
-    - ATS Compliance: {scores['atis_score']}/100
+    **Resume Content:**
+    {resume_text[:10000]}
 
-    **Required Output Format** (STRICTLY FOLLOW THIS JSON STRUCTURE):
+    **Current Assessment Scores:**
+    - Overall Match: {normalized_scores['final_score']}/100
+    - Skill Match: {normalized_scores['skill_score']}/1.0
+    - Experience Match: {normalized_scores['experience_score']}/1.0
+    - ATS Compliance: {normalized_scores['atis_score']}/100
+
+    **Analysis Tasks:**
+    1. Identify 3 specific improvements with actionable recommendations
+    2. List missing qualifications with importance level
+    3. Highlight 2 key strengths with evidence
+    4. Identify 2 weaknesses with improvement suggestions
+    5. Recommend 5-10 keywords to include
+    6. Provide formatting optimization tips
+    7. Generate personalized summary
+
+    **Output Format (JSON):**
     {{
       "improvements": [
-        "Specific actionable improvement 1",
-        "Specific actionable improvement 2",
-        "Specific actionable improvement 3"
+        {{
+          "title": "Improvement area",
+          "description": "Specific suggestion",
+          "impact": "High/Medium/Low",
+          "example": "Concrete example from resume"
+        }}
       ],
       "missing_qualifications": [
-        "Missing qualification 1 with explanation",
-        "Missing qualification 2 with explanation"
+        {{
+          "skill": "Missing qualification",
+          "importance": "Essential/Nice-to-have",
+          "suggestion": "How to acquire"
+        }}
       ],
       "strengths": [
-        "Key strength 1 with evidence",
-        "Key strength 2 with evidence"
+        {{
+          "title": "Strength name",
+          "evidence": "Specific example",
+          "relevance": "How it matches job"
+        }}
       ],
       "weaknesses": [
-        "Key weakness 1 with suggestions",
-        "Key weakness 2 with suggestions"
+        {{
+          "title": "Weakness area",
+          "description": "Specific issue",
+          "suggestion": "Improvement strategy"
+        }}
       ],
-      "suggested_keywords": ["keyword1", "keyword2", "keyword3"],
-      "formatting_suggestions": "Specific formatting recommendations",
-      "overall_feedback": "2-3 sentence summary of fit for position"
+      "keywords": {{
+        "missing": ["list", "of", "keywords"],
+        "present": ["list", "of", "matched", "keywords"]
+      }},
+      "formatting": {{
+        "issues": ["list", "of", "formatting", "issues"],
+        "suggestions": ["specific", "formatting", "tips"]
+      }},
+      "summary": "2-3 paragraph personalized summary with overall fit assessment",
+      "salary_estimate": {{
+        "range": "Estimated salary range based on match",
+        "confidence": "High/Medium/Low"
+      }}
     }}
-
-    **Analysis Guidelines**:
-    1. Be specific and actionable in all suggestions
-    2. Reference exact phrases from resume/JD when possible
-    3. Prioritize suggestions that will most improve scores
-    4. Consider both content and formatting aspects
-    5. Provide concrete examples for improvements
     """
 
     try:
-        
         response = model.generate_content(
             prompt,
             generation_config={
-                "temperature": 0.3, 
-                "max_output_tokens": 2000,
-                "top_p": 0.95
+                "temperature": 0.2,
+                "max_output_tokens": 3000,
+                "top_p": 0.9
             }
         )
-
-        # parsing
-        return extract_structured_response(response.text)
+        return parse_response(response.text)
     except Exception as e:
-        print(f"Gemini API error: {str(e)}")
-        return {
-            "error": "AI analysis unavailable",
-            "improvements": ["Ensure your resume matches keywords from the job description"],
-            "missing_qualifications": ["Check the job description for required qualifications"],
-            "strengths": [],
-            "weaknesses": [],
-            "suggested_keywords": [],
-            "formatting_suggestions": "Use standard resume formatting with clear sections",
-            "overall_feedback": "Basic analysis complete. For detailed feedback, check the scores."
-        }
+        logger.error(f"Gemini API error: {str(e)}")
+        return get_fallback_response()
 
-
-def extract_structured_response(text):
-    """More robust response parsing"""
+def parse_response(text: str) -> Dict[str, Any]:
+    """Enhanced response parsing with validation"""
     try:
-        # First try to find JSON markdown
-        json_match = re.search(r'```json\n({.*?})\n```', text, re.DOTALL)
-        if json_match:
-            return json.loads(json_match.group(1))
+        # Clean response text
+        text = text.replace("```json", "").replace("```", "").strip()
 
-        # Fallback to finding raw JSON
-        json_str = text[text.find('{'):text.rfind('}') + 1]
-        return json.loads(json_str)
-    except json.JSONDecodeError:
-        return parse_unstructured_response(text)
+        # Parse JSON with basic validation
+        result = json.loads(text)
 
+        # Validate structure
+        required_keys = ['improvements', 'missing_qualifications', 'strengths',
+                       'weaknesses', 'keywords', 'formatting', 'summary']
+        for key in required_keys:
+            if key not in result:
+                raise ValueError(f"Missing required key: {key}")
 
-def parse_unstructured_response(text):
-    """Parse unstructured Gemini response"""
-    result = {
-        "improvements": [],
-        "missing_qualifications": [],
-        "strengths": [],
-        "weaknesses": [],
-        "suggested_keywords": [],
-        "formatting_suggestions": "",
-        "overall_feedback": ""
+        return result
+    except Exception as e:
+        logger.error(f"Error parsing response: {str(e)}")
+        return get_fallback_response()
+
+def get_fallback_response() -> Dict[str, Any]:
+    """Comprehensive fallback response"""
+    return {
+        "improvements": [{
+            "title": "Keyword Optimization",
+            "description": "Add more job-specific keywords from the description",
+            "impact": "High",
+            "example": None
+        }],
+        "missing_qualifications": [{
+            "skill": "Job-specific skills",
+            "importance": "Essential",
+            "suggestion": "Review job description for required skills"
+        }],
+        "strengths": [{
+            "title": "Relevant Experience",
+            "evidence": "Matching work history found",
+            "relevance": "High"
+        }],
+        "weaknesses": [{
+            "title": "Formatting",
+            "description": "Could improve resume structure",
+            "suggestion": "Use standard sections (Experience, Education, Skills)"
+        }],
+        "keywords": {
+            "missing": [],
+            "present": []
+        },
+        "formatting": {
+            "issues": ["Could improve readability"],
+            "suggestions": ["Use bullet points for achievements"]
+        },
+        "summary": "Your resume shows potential but could be better optimized for this position. Focus on adding specific keywords and quantifiable achievements.",
+        "salary_estimate": {
+            "range": "Not available",
+            "confidence": "Low"
+        }
     }
-
-    # Extract improvements
-    improvements = re.findall(r'\d+\.\s*(.*?)(?=\n\d+\.|\n\n|$)', text)
-    if improvements and len(improvements) >= 3:
-        result["improvements"] = improvements[:3]
-
-    return result
