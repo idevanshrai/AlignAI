@@ -91,8 +91,7 @@ uploadForm.addEventListener('submit', async function(e) {
     formData.append('resume', document.getElementById('resume').files[0]);
     formData.append('jobdesc', document.getElementById('jobdesc').value);
 
-    // In a real app, this would be your actual API endpoint
-    const response = await fetch('http://127.0.0.1:5001/analyze', {
+    const response = await fetch('https://alignai.onrender.com/analyze', {
       method: 'POST',
       body: formData
     });

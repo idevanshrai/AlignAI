@@ -1,0 +1,12 @@
+{
+  "name": "alignai-frontend",
+  "version": "1.0.0",
+  "description": "AlignAI Frontend Application",
+  "main": "splash.html",
+  "scripts": {
+    "start": "serve -s ."
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+} 
