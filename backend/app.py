@@ -9,6 +9,7 @@ import logging
 import numpy as np
 import datetime
 from typing import Dict, Any, List
+import torch
 
 # Configure logging
 logging.basicConfig(
@@ -25,6 +26,10 @@ except LookupError:
     nltk.download('punkt')
     nltk.download('stopwords')
 
+# Memory optimization settings
+if torch.cuda.is_available():
+    torch.cuda.empty_cache()
+
 app = Flask(__name__)
 # Enable CORS with explicit configuration
 CORS(app, resources={
@@ -36,6 +41,10 @@ CORS(app, resources={
         "supports_credentials": False
     }
 })
+
+# Configure app for better memory handling
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit upload size to 16MB
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 def convert_numpy_types(obj):
     """Convert numpy types to native Python types"""
