@@ -6,13 +6,37 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 import re
 from collections import defaultdict
 import logging
+import torch
+import gc
 
 # Initialize logging
 logger = logging.getLogger(__name__)
 
-# Initialize models
-model = SentenceTransformer('all-mpnet-base-v2')
+# Initialize models lazily
+model = None
 tfidf_vectorizer = TfidfVectorizer(ngram_range=(1, 3), stop_words='english', max_features=5000)
+
+def get_model():
+    global model
+    if model is None:
+        try:
+            # Set device
+            device = torch.device('cpu')
+            # Load model with minimal memory usage
+            model = SentenceTransformer('all-mpnet-base-v2', device=device)
+            # Clear CUDA cache if using GPU
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        except Exception as e:
+            logger.error(f"Error loading model: {str(e)}")
+            return None
+    return model
+
+def cleanup_memory():
+    """Clean up memory after processing"""
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    gc.collect()
 
 def calculate_atis_score(text):
     """Enhanced ATIS (Applicant Tracking System) score calculation"""
@@ -102,9 +126,23 @@ def calculate_match_score(resume_text, jd_text, resume_skills, jd_skills):
         tfidf_score = (tfidf_matrix * tfidf_matrix.T).toarray()[0, 1]
 
         # Semantic Match (BERT)
-        resume_embedding = model.encode(resume_text, convert_to_tensor=True)
-        jd_embedding = model.encode(jd_text, convert_to_tensor=True)
-        bert_score = util.pytorch_cos_sim(resume_embedding, jd_embedding).item()
+        model = get_model()
+        if model is None:
+            bert_score = 0
+        else:
+            with torch.no_grad():  # Disable gradient calculation
+                try:
+                    resume_embedding = model.encode(resume_text, convert_to_tensor=True, show_progress_bar=False)
+                    jd_embedding = model.encode(jd_text, convert_to_tensor=True, show_progress_bar=False)
+                    bert_score = float(util.pytorch_cos_sim(resume_embedding, jd_embedding).item())
+                    # Clear memory
+                    del resume_embedding
+                    del jd_embedding
+                except Exception as e:
+                    logger.error(f"Error in BERT encoding: {str(e)}")
+                    bert_score = 0
+                finally:
+                    cleanup_memory()
 
         # Skill Matching
         skill_score, matched_skills, missing_skills = calculate_skill_match(resume_skills, jd_skills)
