@@ -3,18 +3,20 @@
 set -o errexit
 
 echo "Current directory: $(pwd)"
+echo "Directory contents:"
+ls -la
 
 # Install Python dependencies
 pip install --upgrade pip
+cd backend
 pip install -r requirements.txt
 
 # Create necessary directories if they don't exist
 mkdir -p logs
 
-# Ensure gunicorn config exists and is executable
-if [ ! -f "gunicorn_config.py" ]; then
-    echo "Creating gunicorn_config.py..."
-    cat > gunicorn_config.py << 'EOL'
+# Create gunicorn config
+echo "Creating gunicorn_config.py..."
+cat > gunicorn_config.py << 'EOL'
 import multiprocessing
 
 # Worker configuration
@@ -41,12 +43,19 @@ proc_name = 'alignai_backend'
 
 # Prevent worker timeout during model loading
 preload_app = True
+
+# Bind to PORT from environment variable
+bind = "0.0.0.0:10000"
 EOL
-fi
 
 chmod +x gunicorn_config.py
+
+echo "Directory contents after setup:"
+ls -la
 
 # Install NLTK data
 python -m nltk.downloader punkt
 python -m nltk.downloader stopwords
 python -m nltk.downloader averaged_perceptron_tagger
+
+echo "Build script completed successfully"
