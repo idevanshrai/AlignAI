@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlignAI | Resume Analyzer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <i class="bi bi-robot"></i>
+        <span>Align<span class="text-gradient">AI</span></span>
+      </div>
+      <div class="user-menu">
+        <div class="dropdown">
+          <button class="user-btn dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle"></i>
+            <span id="username">Guest</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#" id="historyBtn"><i class="bi bi-clock-history"></i> View History</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="analyzer-container">
+        <div class="header-section">
+          <h1><span class="text-gradient">Resume</span> Analyzer</h1>
+          <p class="subtitle">Get instant feedback on how well your resume matches any job description</p>
+        </div>
+
+        <form id="uploadForm" class="analyzer-form">
+          <div class="form-section">
+            <label for="resume" class="form-label">
+              <i class="bi bi-file-earmark-pdf"></i> Upload Resume (PDF)
+            </label>
+            <div class="file-upload">
+              <input type="file" id="resume" name="resume" accept="application/pdf" required>
+              <div class="upload-area" id="uploadArea">
+                <i class="bi bi-cloud-arrow-up"></i>
+                <p>Drag & drop your resume or click to browse</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <label for="jobdesc" class="form-label">
+              <i class="bi bi-card-text"></i> Job Description
+            </label>
+            <textarea class="form-control" id="jobdesc" name="jobdesc" rows="6"
+                      placeholder="Paste the job description you're applying for..." required></textarea>
+          </div>
+
+          <button type="submit" class="analyze-btn" id="analyzeBtn">
+            <span class="btn-text">Analyze Resume</span>
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </form>
+
+        <div class="error-message" id="errorMsg"></div>
+      </div>
+
+      <!-- Results Section (Initially hidden) -->
+      <div class="results-container" id="results">
+        <div class="overall-score">
+          <div class="score-header">
+            <h2>Analysis Results</h2>
+            <div class="score-value">
+              <span id="finalScore">0</span>%
+            </div>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" id="scoreBar"></div>
+          </div>
+          <p class="score-feedback" id="scoreFeedback"></p>
+        </div>
+
+        <div class="results-grid">
+          <!-- Scores Card -->
+          <div class="results-card">
+            <div class="card-header">
+              <i class="bi bi-graph-up"></i> Analysis Scores
+            </div>
+            <div class="card-body">
+              <div class="score-item">
+                <div class="score-info">
+                  <span>TF-IDF Similarity</span>
+                  <small>Text relevance</small>
+                </div>
+                <div class="score-value" id="tfidfScore">0</div>
+              </div>
+              <div class="score-item">
+                <div class="score-info">
+                  <span>Semantic Match</span>
+                  <small>Contextual understanding</small>
+                </div>
+                <div class="score-value" id="bertScore">0</div>
+              </div>
+              <div class="score-item">
+                <div class="score-info">
+                  <span>Skill Match</span>
+                  <small>Required skills</small>
+                </div>
+                <div class="score-value" id="skillScore">0</div>
+              </div>
+              <div class="score-item">
+                <div class="score-info">
+                  <span>ATS Compliance</span>
+                  <small>Resume formatting</small>
+                </div>
+                <div class="score-value" id="atisScore">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills Card -->
+          <div class="results-card">
+            <div class="card-header">
+              <i class="bi bi-tools"></i> Skills Analysis
+            </div>
+            <div class="card-body">
+              <div class="skills-section">
+                <h6>Matched Skills</h6>
+                <div class="skills-container" id="matchedSkills"></div>
+              </div>
+              <div class="skills-section">
+                <h6>Missing Skills</h6>
+                <div class="skills-container" id="missingSkills"></div>
+              </div>
+              <div class="skills-section">
+                <h6>Resume Length</h6>
+                <div class="length-indicator">
+                  <div class="progress-track">
+                    <div class="progress-thumb" id="resumeLengthBar"></div>
+                  </div>
+                  <span id="resumeLengthText">0 words</span>
+                </div>
+                <small class="hint">Ideal: 400-600 words</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Suggestions -->
+        <div class="ai-suggestions" id="insightsCard">
+          <div class="card-header">
+            <i class="bi bi-lightbulb"></i> AI-Powered Suggestions
+          </div>
+          <div class="card-body" id="geminiInsights"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- History Modal -->
+    <div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-clock-history"></i> Analysis History</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="history-list" id="historyList">
+              <!-- History items will be added here dynamically -->
+              <div class="empty-state">
+                <i class="bi bi-folder-x"></i>
+                <p>No analysis history yet</p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./js/script.js"></script>
+</body>
+</html> 
