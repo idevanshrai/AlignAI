@@ -2,8 +2,10 @@ services:
   - type: web
     name: alignai-backend
     env: python
-    buildCommand: "./build.sh"
-    startCommand: "cd backend && gunicorn -c gunicorn_config.py app:app"
+    buildCommand: "cd backend && ./build.sh"
+    startCommand: "gunicorn -c gunicorn_config.py app:app"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.0 
+        value: 3.9.0
+      - key: PORT
+        value: 10000 
