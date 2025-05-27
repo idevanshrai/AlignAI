@@ -25,4 +25,8 @@ echo "Setting up environment..."
 export PYTHONPATH="${PYTHONPATH}:${PWD}"
 export NLTK_DATA="${PWD}/nltk_data"
 
+# Ensure gunicorn config is in the right place
+echo "Setting up gunicorn configuration..."
+chmod 644 gunicorn_config.py
+
 echo "Build script completed successfully"

@@ -1,4 +1,5 @@
 import multiprocessing
+import os
 
 # Worker configuration
 workers = 1  # Reduce number of workers to minimize memory usage
@@ -23,4 +24,8 @@ loglevel = 'info'
 proc_name = 'alignai_backend'
 
 # Prevent worker timeout during model loading
-preload_app = True 
+preload_app = True
+
+# Bind to PORT from environment variable
+port = os.environ.get('PORT', '10000')
+bind = f"0.0.0.0:{port}" 
